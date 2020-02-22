@@ -26,21 +26,22 @@ class TestComponentTwo {
 describe('EntityManager', () => {
   const testManager = new EntityManager();
   const testEntity = testManager.createEntity();
-  it('properly creates an entity', () => {
+  it('creates an entity', () => {
     expect(typeof testEntity).toEqual('object');
     expect(testEntity.components).toEqual([]);
     expect(testEntity.id).toEqual(0);
     expect(testEntity.manager).toBe(testManager);
     expect(testEntity.tags).toEqual([]);
   });
-  it('properly adds components', () => {
-    testEntity.addComponent(new TestComponentOne(testEntity, 17, 23));
-    testEntity.addComponent(
-      new TestComponentTwo(testEntity, 'test name', {
-        testOptionOne: 1,
-        testOptionTwo: ['a'],
-      })
-    );
+  it('adds components', () => {
+    testEntity
+      .addComponent(new TestComponentOne(testEntity, 17, 23))
+      .addComponent(
+        new TestComponentTwo(testEntity, 'test name', {
+          testOptionOne: 1,
+          testOptionTwo: ['a'],
+        })
+      );
     expect(testEntity.components.length).toEqual(2);
     expect(testEntity.components[0]).toEqual('testComponentOne');
     expect(testEntity.components[1]).toEqual('testComponentTwo');
@@ -51,5 +52,12 @@ describe('EntityManager', () => {
     expect(testEntity.testComponentTwo.name).toEqual('test name');
     expect(testEntity.testComponentTwo.options.testOptionOne).toEqual(1);
     expect(testEntity.testComponentTwo.options.testOptionTwo[0]).toEqual('a');
+  });
+  it('removes single components', () => {
+    testEntity.removeComponent('testComponentOne');
+    expect(testEntity.components.length).toEqual(1);
+    expect(testEntity.components[0]).toEqual('testComponentTwo');
+    expect(testEntity.testComponentOne).toEqual(undefined);
+    expect(testEntity.testComponentTwo.entity).toBe(testEntity);
   });
 });
