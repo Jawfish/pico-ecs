@@ -40,6 +40,7 @@ export class EntityManager {
       const n = entities.indexOf(entity);
       if (~n) entities.splice(n, 1);
     }
+    // TODO: deal with this
     // entity.manager = null;
     this.entityPool.recycle(entity);
   };
@@ -110,6 +111,7 @@ export class EntityManager {
   };
 }
 
+// TODO: implement groups
 // class Group {
 //   components: object[];
 //   entities: Entity[];

@@ -39,7 +39,7 @@ export class Entity implements StringKey {
     }
     return false;
   };
-  hasAllComponents = (componentsToCheck: object[]): boolean => {
+  hasAllComponents = (componentsToCheck: string[]): boolean => {
     return componentsToCheck.every(component =>
       this.components.hasOwnProperty(component.constructor.name)
     );

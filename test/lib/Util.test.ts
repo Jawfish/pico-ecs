@@ -1,5 +1,5 @@
 import * as Util from '../../src/lib/Util';
-
+// TODO: change this to check hasAllComponents on Entity
 describe('containsEvery', () => {
   it('should return true if the first array contains every item in the second array', () => {
     const containsEveryTestFun = (
