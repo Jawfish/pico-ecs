@@ -74,16 +74,16 @@ export class EntityManager {
     }
   };
 
-  removeComponent = (entity: Entity, component: any) => {
+  removeComponent = (entity: Entity, component: string) => {
     const components = entity.components;
-    const componentIndex = components.indexOf(component.name);
-    console.log(componentIndex);
-    if (componentIndex !== -1) {
-      components.splice(componentIndex);
+    const componentIndex = components.indexOf(component);
+    if (entity.hasComponent(component)) {
+      delete entity[component];
       delete components[componentIndex];
+      components.splice(componentIndex, 1);
     }
   };
-  queryComponents = (components: object[]): Entity[] => {
+  queryComponents = (components: string[]): Entity[] => {
     const entities: Entity[] = [];
     this.entities.forEach(entity => {
       components.forEach(component => {

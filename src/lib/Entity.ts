@@ -10,7 +10,7 @@ export class Entity implements StringKey {
   [key: string]: any;
   id: number;
   manager: EntityManager;
-  components: Array<{}>;
+  components: string[];
   tags: string[];
   constructor(manager: EntityManager) {
     this.id = nextId++;
@@ -28,18 +28,14 @@ export class Entity implements StringKey {
     this.manager.addComponent(this, component);
     return this;
   };
-  removeComponent = (component: {}): Entity => {
+  removeComponent = (component: string): Entity => {
     this.manager.removeComponent(this, component);
     return this;
   };
   removeAllComponents = () => this.manager.removeAllComponents(this);
-  // tslint:disable-next-line:no-any
-  hasComponent = (componentTocheck: any): boolean => {
-    for (const index in this.components) {
-      // TODO: change this to use the component name formatter
-      if (componentTocheck.name.toLowerCase() === this.components[index]) {
-        return true;
-      }
+  hasComponent = (componentTocheck: string): boolean => {
+    if (this.components.includes(componentTocheck)) {
+      return true;
     }
     return false;
   };
