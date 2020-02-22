@@ -8,7 +8,7 @@
     "tsc": "tsc",
     "gts": "gts",
     "watch": "tsc -w src/Index.ts -outDir dist/",
-    "testWatch": "jest --watchAll",
+    "twatch": "jest --watchAll",
     "build": "tsc src/Index.ts -outDir dist/",
     "check": "gts check",
     "clean": "gts clean",
