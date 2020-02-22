@@ -2,13 +2,14 @@
   "name": "pico-ecs",
   "version": "1.0.0",
   "description": "Small Entity-Component-System library built in TypeScript.",
-  "main": "/src/index.ts",
+  "main": "/src/Index.ts",
   "scripts": {
     "test": "jest",
     "tsc": "tsc",
     "gts": "gts",
-    "watch": "tsc -w src/index.ts -outDir dist/",
-    "build": "tsc src/index.ts -outDir dist/",
+    "watch": "tsc -w src/Index.ts -outDir dist/",
+    "testWatch": "jest --watchAll",
+    "build": "tsc src/Index.ts -outDir dist/",
     "check": "gts check",
     "clean": "gts clean",
     "fix": "gts fix"
