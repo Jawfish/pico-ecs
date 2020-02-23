@@ -22,7 +22,7 @@ class TestComponentTwo {
     this.options = options;
   }
 }
-
+// TODO: change tests to not use/mutate the same entity
 describe('EntityManager', () => {
   const testManager = new EntityManager();
   const testEntity = testManager.createEntity();
@@ -32,6 +32,10 @@ describe('EntityManager', () => {
     expect(testEntity.id).toEqual(0);
     expect(testEntity.manager).toBe(testManager);
     expect(testEntity.tags).toEqual([]);
+  });
+  it('counts entities', () => {
+    const testEntity2 = testManager.createEntity();
+    expect(testManager.count()).toEqual(2);
   });
   it('adds components', () => {
     testEntity
@@ -59,5 +63,10 @@ describe('EntityManager', () => {
     expect(testEntity.components[0]).toEqual('testComponentTwo');
     expect(testEntity.testComponentOne).toEqual(undefined);
     expect(testEntity.testComponentTwo.entity).toBe(testEntity);
+  });
+  it('removes entities', () => {
+    const count = testManager.count();
+    testEntity.remove();
+    expect(testManager.count()).toEqual(count - 1);
   });
 });

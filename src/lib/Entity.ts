@@ -10,6 +10,7 @@ export class Entity implements StringKey {
   [key: string]: any;
   id: number;
   manager: EntityManager;
+  // change this to keep an array of component objects
   components: string[];
   tags: string[];
   constructor(manager: EntityManager) {
@@ -41,7 +42,7 @@ export class Entity implements StringKey {
   };
   hasAllComponents = (componentsToCheck: string[]): boolean => {
     return componentsToCheck.every(component =>
-      this.components.hasOwnProperty(component.constructor.name)
+      this.components.includes(component)
     );
   };
   hasTag = (tag: string) => this.tags.includes(tag);

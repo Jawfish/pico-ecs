@@ -28,19 +28,13 @@ export class EntityManager {
     });
   };
   removeEntity = (entity: Entity) => {
-    const index = this.entities.indexOf(entity);
-    if (index === -1) throw new Error('Tried to remove nonexistent entity');
-
+    if (!this.entities.includes(entity))
+      throw new Error('Tried to remove nonexistent entity');
     this.removeAllComponents(entity);
-    this.entities.splice(index, 1);
     entity.tags.length = 0;
-    // tslint:disable-next-line:forin
-    for (const tag in this.tags) {
-      const entities = this.tags[tag];
-      const n = entities.indexOf(entity);
-      if (~n) entities.splice(n, 1);
-    }
+    this.entities = this.entities.filter(item => item !== entity);
     // TODO: deal with this
+    // TODO: remove tags
     // entity.manager = null;
     this.entityPool.recycle(entity);
   };
@@ -60,7 +54,7 @@ export class EntityManager {
     entities.splice(index, 1);
     entity.tags.splice(entity.tags.indexOf(tag), 1);
   };
-  // TODO: make this not shit
+
   addComponent = (entity: Entity, component: {}) => {
     if (component.constructor.name in entity.components) return;
     const componentName = this.componentPropertyName(component);
