@@ -1,10 +1,40 @@
 import { EntityManager } from '../../src/lib/EntityManager';
 import { Entity } from '../../src/lib/Entity';
+import { Component } from '../../src/lib/Component';
 
-class TestComponentOne {}
-class TestComponentTwo {}
-class TestComponentThree {}
-class TestComponentFour {}
+class TestComponentOne implements Component {
+  name: string;
+  entity: Entity | null;
+  constructor() {
+    this.name = this.constructor.name;
+    this.entity = null;
+  }
+}
+
+class TestComponentTwo implements Component {
+  name: string;
+  entity: Entity | null;
+  constructor() {
+    this.name = this.constructor.name;
+    this.entity = null;
+  }
+}
+class TestComponentThree implements Component {
+  name: string;
+  entity: Entity | null;
+  constructor() {
+    this.name = this.constructor.name;
+    this.entity = null;
+  }
+}
+class TestComponentFour implements Component {
+  name: string;
+  entity: Entity | null;
+  constructor() {
+    this.name = this.constructor.name;
+    this.entity = null;
+  }
+}
 
 // TODO: change tests to not use/mutate the same entity
 describe('Entity', () => {
@@ -14,17 +44,14 @@ describe('Entity', () => {
     .addComponent(new TestComponentOne())
     .addComponent(new TestComponentTwo())
     .addComponent(new TestComponentThree());
+
   it('knows if it has a component', () => {
-    expect(testEntity.hasComponent('testComponentOne')).toEqual(true);
-    expect(testEntity.hasComponent('TestComponentOne')).toEqual(false);
-    expect(testEntity.hasComponent('testComponentTwo')).toEqual(true);
-    expect(testEntity.hasComponent('testComponentThree')).toEqual(true);
-    expect(testEntity.hasComponent('testComponentFour')).toEqual(false);
+    expect(testEntity.hasComponent(TestComponentOne)).toEqual(true);
+    expect(testEntity.hasComponent(TestComponentTwo)).toEqual(true);
+    expect(testEntity.hasComponent(TestComponentThree)).toEqual(true);
+    expect(testEntity.hasComponent(TestComponentFour)).toEqual(false);
   });
   it('can check if it has every component in a list of components', () => {
-    testEntity
-      .removeComponent('testComponentTwo')
-      .removeComponent('testComponentThree');
     const containsEveryTestFun = (
       // tslint:disable
       compareAgainst: any[],
@@ -39,29 +66,31 @@ describe('Entity', () => {
       return bool;
     };
     expect(
-      testEntity.hasAllComponents(['testComponentOne', 'testComponentTwo'])
+      testEntity.hasAllComponents([
+        new TestComponentOne(),
+        new TestComponentTwo(),
+      ])
     ).toEqual(false);
     expect(
-      testEntity.hasAllComponents(['testComponentOne', 'testComponentThree'])
+      testEntity.hasAllComponents([
+        new TestComponentOne(),
+        new TestComponentThree(),
+      ])
     ).toEqual(false);
     testEntity.addComponent(new TestComponentFour());
     expect(
-      testEntity.hasAllComponents(['testComponentOne', 'testComponentFour'])
-    ).toEqual(true);
-    testEntity.removeComponent('testComponentThree');
-    expect(
       testEntity.hasAllComponents([
-        'testComponentOne',
-        'testComponentTwo',
-        'testComponentThree',
-        'testComponentFour',
+        new TestComponentOne(),
+        new TestComponentTwo(),
+        new TestComponentThree(),
+        new TestComponentFour(),
       ])
     ).toEqual(
       containsEveryTestFun(testEntity.components, [
-        'testComponentOne',
-        'testComponentTwo',
-        'testComponentThree',
-        'testComponentFour',
+        new TestComponentOne(),
+        new TestComponentTwo(),
+        new TestComponentThree(),
+        new TestComponentFour(),
       ])
     );
   });

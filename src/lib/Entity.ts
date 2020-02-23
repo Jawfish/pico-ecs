@@ -1,17 +1,14 @@
 import { EntityManager } from './EntityManager';
+import { Component } from './Component';
 
 let nextId = 0;
 
-interface StringKey {
-  [key: string]: any;
-}
-
-export class Entity implements StringKey {
+export class Entity {
+  // tslint:disable-next-line:no-any
   [key: string]: any;
   id: number;
   manager: EntityManager;
-  // change this to keep an array of component objects
-  components: string[];
+  components: Component[];
   tags: string[];
   constructor(manager: EntityManager) {
     this.id = nextId++;
@@ -25,22 +22,27 @@ export class Entity implements StringKey {
     this.components = [];
     this.tags.length = 0;
   };
-  addComponent = (component: {}): Entity => {
+  addComponent = (component: Component): Entity => {
     this.manager.addComponent(this, component);
     return this;
   };
-  removeComponent = (component: string): Entity => {
+  removeComponent = (component: any): Entity => {
     this.manager.removeComponent(this, component);
     return this;
   };
   removeAllComponents = () => this.manager.removeAllComponents(this);
-  hasComponent = (componentTocheck: string): boolean => {
-    if (this.components.includes(componentTocheck)) {
-      return true;
+  // tslint:disable-next-line:no-any
+  hasComponent(component: any): boolean {
+    let exists = false;
+    for (let i = 0; i < this.components.length; i++) {
+      if (this.components[i].name === component.name) {
+        exists = true;
+        break;
+      }
     }
-    return false;
-  };
-  hasAllComponents = (componentsToCheck: string[]): boolean => {
+    return exists;
+  }
+  hasAllComponents = (componentsToCheck: Component[]): boolean => {
     return componentsToCheck.every(component =>
       this.components.includes(component)
     );

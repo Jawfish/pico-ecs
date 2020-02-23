@@ -1,24 +1,27 @@
 import { EntityManager } from '../../src/lib/EntityManager';
 import { Entity } from '../../src/lib/Entity';
+import { Component } from '../../src/lib/Component';
 
-class TestComponentOne {
-  entity: Entity;
+class TestComponentOne implements Component {
+  name: string;
+  entity: Entity | null;
   x: number;
   y: number;
-  constructor(entity: Entity, x: number, y: number) {
-    this.entity = entity;
+  constructor(x: number, y: number) {
+    this.name = this.constructor.name;
+    this.entity = null;
     this.x = x;
     this.y = y;
   }
 }
 
 class TestComponentTwo {
-  entity: Entity;
   name: string;
+  entity: Entity | null;
   options: object;
-  constructor(entity: Entity, name: string, options: object) {
-    this.entity = entity;
-    this.name = name;
+  constructor(options: object) {
+    this.name = this.constructor.name;
+    this.entity = null;
     this.options = options;
   }
 }
@@ -38,31 +41,29 @@ describe('EntityManager', () => {
     expect(testManager.count()).toEqual(2);
   });
   it('adds components', () => {
-    testEntity
-      .addComponent(new TestComponentOne(testEntity, 17, 23))
-      .addComponent(
-        new TestComponentTwo(testEntity, 'test name', {
-          testOptionOne: 1,
-          testOptionTwo: ['a'],
-        })
-      );
+    testEntity.addComponent(new TestComponentOne(17, 23)).addComponent(
+      new TestComponentTwo({
+        testOptionOne: 1,
+        testOptionTwo: ['a'],
+      })
+    );
     expect(testEntity.components.length).toEqual(2);
-    expect(testEntity.components[0]).toEqual('testComponentOne');
-    expect(testEntity.components[1]).toEqual('testComponentTwo');
-    expect(testEntity.testComponentOne.entity).toBe(testEntity);
-    expect(testEntity.testComponentOne.x).toEqual(17);
-    expect(testEntity.testComponentOne.y).toEqual(23);
-    expect(testEntity.testComponentTwo.entity).toBe(testEntity);
-    expect(testEntity.testComponentTwo.name).toEqual('test name');
-    expect(testEntity.testComponentTwo.options.testOptionOne).toEqual(1);
-    expect(testEntity.testComponentTwo.options.testOptionTwo[0]).toEqual('a');
+    expect(testEntity.components[0].name).toEqual('TestComponentOne');
+    expect(testEntity.components[1].name).toEqual('TestComponentTwo');
+    expect(testEntity.TestComponentOne.entity).toBe(testEntity);
+    expect(testEntity.TestComponentOne.x).toEqual(17);
+    expect(testEntity.TestComponentOne.y).toEqual(23);
+    expect(testEntity.TestComponentTwo.entity).toBe(testEntity);
+    expect(testEntity.TestComponentTwo.name).toEqual('TestComponentTwo');
+    expect(testEntity.TestComponentTwo.options.testOptionOne).toEqual(1);
+    expect(testEntity.TestComponentTwo.options.testOptionTwo[0]).toEqual('a');
   });
   it('removes single components', () => {
-    testEntity.removeComponent('testComponentOne');
+    testEntity.removeComponent(TestComponentOne);
     expect(testEntity.components.length).toEqual(1);
-    expect(testEntity.components[0]).toEqual('testComponentTwo');
-    expect(testEntity.testComponentOne).toEqual(undefined);
-    expect(testEntity.testComponentTwo.entity).toBe(testEntity);
+    expect(testEntity.components[0].name).toEqual('TestComponentTwo');
+    expect(testEntity.TestComponentOne).toEqual(undefined);
+    expect(testEntity.TestComponentTwo.entity).toBe(testEntity);
   });
   it('removes entities', () => {
     const count = testManager.count();

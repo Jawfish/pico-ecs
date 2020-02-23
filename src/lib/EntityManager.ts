@@ -1,6 +1,6 @@
 import { EntityPool } from './EntityPool';
 import { Entity } from './Entity';
-
+import { Component } from './Component';
 export class EntityManager {
   private tags: { [key: string]: Entity[] };
   private entities: Entity[];
@@ -28,8 +28,9 @@ export class EntityManager {
     });
   };
   removeEntity = (entity: Entity) => {
-    if (!this.entities.includes(entity))
+    if (!this.entities.includes(entity)) {
       throw new Error('Tried to remove nonexistent entity');
+    }
     this.removeAllComponents(entity);
     entity.tags.length = 0;
     this.entities = this.entities.filter(item => item !== entity);
@@ -55,12 +56,12 @@ export class EntityManager {
     entity.tags.splice(entity.tags.indexOf(tag), 1);
   };
 
-  addComponent = (entity: Entity, component: {}) => {
-    if (component.constructor.name in entity.components) return;
-    const componentName = this.componentPropertyName(component);
-    entity[componentName] = component;
-    entity[componentName].entity = entity;
-    entity.components.push(componentName);
+  addComponent = (entity: Entity, component: Component) => {
+    if (!entity.components.includes(component)) {
+      entity[component.name] = component;
+      entity[component.name].entity = entity;
+      entity.components.push(component);
+    }
   };
   removeAllComponents = (entity: Entity) => {
     // tslint:disable-next-line:forin
@@ -68,17 +69,19 @@ export class EntityManager {
       entity.removeComponent(entity.components[component]);
     }
   };
-
-  removeComponent = (entity: Entity, component: string) => {
-    const components = entity.components;
-    const componentIndex = components.indexOf(component);
+  // currently doesn't work because it gets passed a new instance of a Component
+  // and therefore entity.components.includes(component) always returns false
+  removeComponent = (entity: Entity, component: Component) => {
     if (entity.hasComponent(component)) {
-      delete entity[component];
-      delete components[componentIndex];
-      components.splice(componentIndex, 1);
+      entity.components = entity.components.filter(
+        item => item.name !== component.name
+      );
+
+      delete entity.components[entity.components.indexOf(component)];
+      delete entity[component.name];
     }
   };
-  queryComponents = (components: string[]): Entity[] => {
+  queryComponents = (components: Component[]): Entity[] => {
     const entities: Entity[] = [];
     this.entities.forEach(entity => {
       components.forEach(component => {
@@ -96,12 +99,6 @@ export class EntityManager {
   };
   count = (): number => {
     return this.entities.length;
-  };
-  componentPropertyName = (component: {}): string => {
-    const name = component.constructor.name;
-    if (!name) throw new Error('Component property name is empty');
-
-    return name.charAt(0).toLowerCase() + name.slice(1);
   };
 }
 
