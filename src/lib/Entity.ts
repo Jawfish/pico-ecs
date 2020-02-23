@@ -26,6 +26,7 @@ export class Entity {
     this.manager.addComponent(this, component);
     return this;
   };
+  // tslint:disable-next-line:no-any
   removeComponent = (component: any): Entity => {
     this.manager.removeComponent(this, component);
     return this;
