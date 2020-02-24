@@ -92,19 +92,19 @@ export class EntityManager {
     delete entity[component.name];
   };
 
-  queryComponents = (components: Component[]): Entity[] => {
-    const entities: Entity[] = [];
+  // tslint:disable-next-line:no-any
+  queryComponentOwners = (components: any[]): Entity[] => {
+    const componentOwners: Entity[] = [];
     this.entities.forEach(entity => {
-      components.forEach(component => {
-        if (entity.hasComponent(component)) {
-          entities.push(entity);
-        }
-      });
+      if (!entity.hasAllComponents(components)) {
+        return;
+      }
+      componentOwners.push(entity);
     });
-    return entities;
+    return componentOwners;
   };
 
-  queryTag = (tag: string): Entity[] => {
+  queryTagOwners = (tag: string): Entity[] => {
     let entities = this.tags[tag];
     if (entities === undefined) entities = this.tags[tag] = [];
     return entities;

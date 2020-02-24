@@ -55,6 +55,11 @@ describe('EntityManager', () => {
     expect(testEntity.TestComponentTwo.options.testOptionOne).toEqual(1);
     expect(testEntity.TestComponentTwo.options.testOptionTwo[0]).toEqual('a');
   });
+  it('lists entities that have a set of components', () => {
+    expect(
+      testManager.queryComponentOwners([TestComponentTwo, TestComponentOne])
+    ).toEqual([testEntity]);
+  });
   it('removes single components', () => {
     testEntity.removeComponent(TestComponentOne);
     expect(testEntity.components.length).toEqual(1);
@@ -85,7 +90,7 @@ describe('EntityManager', () => {
     expect(testEntity.tags).toEqual(['testTag1', 'testTag3']);
   });
   it('queries tags', () => {
-    expect(testManager.queryTag('testTag1')).toEqual([testEntity]);
+    expect(testManager.queryTagOwners('testTag1')).toEqual([testEntity]);
   });
   it('removes entities', () => {
     testEntity.remove();

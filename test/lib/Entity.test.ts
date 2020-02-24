@@ -38,25 +38,16 @@ describe('Entity', () => {
     expect(testEntity.hasComponent(TestComponentFour)).toEqual(false);
   });
   it('can check if it has every component in a list of components', () => {
-    const containsEveryTestFun = (
-      // tslint:disable
-      compareAgainst: any[],
-      toCompare: any[]
-      // tslint:enable
-    ) => {
-      let bool = true;
-      for (let i = 0; i < toCompare.length; i++) {
-        const item = toCompare[i];
-        // tslint:disable-next-line:no-bitwise
-        bool = bool && !!~compareAgainst.indexOf(item);
-      }
-      return bool;
-    };
-    expect(
-      testEntity.hasAllComponents([TestComponentOne, TestComponentTwo])
-    ).toEqual(false);
     expect(
       testEntity.hasAllComponents([TestComponentOne, TestComponentThree])
+    ).toEqual(true);
+    expect(
+      testEntity.hasAllComponents([
+        TestComponentOne,
+        TestComponentTwo,
+        TestComponentThree,
+        TestComponentFour,
+      ])
     ).toEqual(false);
     testEntity.addComponent(new TestComponentFour());
     expect(
@@ -66,14 +57,7 @@ describe('Entity', () => {
         TestComponentThree,
         TestComponentFour,
       ])
-    ).toEqual(
-      containsEveryTestFun(testEntity.components, [
-        TestComponentOne,
-        TestComponentTwo,
-        TestComponentThree,
-        TestComponentFour,
-      ])
-    );
+    ).toEqual(true);
   });
   it('knows if it has a tag', () => {
     testEntity

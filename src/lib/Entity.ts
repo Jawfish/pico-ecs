@@ -46,9 +46,12 @@ export class Entity {
 
   // tslint:disable-next-line:no-any
   hasAllComponents = (componentsToCheck: any[]): boolean => {
-    return componentsToCheck.every(component =>
-      this.components.includes(component)
-    );
+    for (let i = 0; i < componentsToCheck.length; i++) {
+      if (!this.hasComponent(componentsToCheck[i])) {
+        return false;
+      }
+    }
+    return true;
   };
 
   hasTag = (tag: string) => this.tags.includes(tag);
