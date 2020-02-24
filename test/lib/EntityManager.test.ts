@@ -70,4 +70,20 @@ describe('EntityManager', () => {
     testEntity.remove();
     expect(testManager.count()).toEqual(count - 1);
   });
+  it('adds tags', () => {
+    testEntity
+      .addTag('testTag1')
+      .addTag('testTag2')
+      .addTag('testTag3');
+    expect(testEntity.tags).toEqual(['testTag1', 'testTag2', 'testTag3']);
+    expect(testManager.listTags()).toEqual([
+      'testTag1',
+      'testTag2',
+      'testTag3',
+    ]);
+  });
+  it('removes tags', () => {
+    testEntity.removeTag('testTag2');
+    expect(testEntity.tags).toEqual(['testTag1', 'testTag3']);
+  });
 });
