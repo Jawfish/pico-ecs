@@ -1,18 +1,15 @@
-import { EntityPool } from './EntityPool';
 import { Entity } from './Entity';
 import { Component } from './Component';
-import { timingSafeEqual } from 'crypto';
+
 export class EntityManager {
   private tags: { [key: string]: Entity[] };
   private entities: Entity[];
-  private entityPool: EntityPool;
   constructor() {
     this.tags = {};
     this.entities = [];
-    this.entityPool = new EntityPool(() => new Entity(this));
   }
   createEntity = (): Entity => {
-    const entity = this.entityPool.get();
+    const entity: Entity = new Entity(this);
     this.entities.push(entity);
     entity.manager = this;
     return entity;
@@ -33,17 +30,16 @@ export class EntityManager {
       throw new Error('Tried to remove nonexistent entity');
     }
     this.removeAllComponents(entity);
-    entity.tags.length = 0;
     this.entities = this.entities.filter(item => item !== entity);
-    // TODO: deal with this
-    // TODO: remove tags
-    // entity.manager = null;
-    this.entityPool.recycle(entity);
   };
   addTag = (entity: Entity, tag: string) => {
+    if (tag === '') {
+      throw new Error('Tried to add an empty tag');
+    }
     let entitiesWithTag = this.tags[tag];
     if (!entitiesWithTag) entitiesWithTag = this.tags[tag] = [];
     if (entitiesWithTag.includes(entity)) return;
+
     entitiesWithTag.push(entity);
     entity.tags.push(tag);
   };
@@ -53,10 +49,17 @@ export class EntityManager {
 
     const index = entities.indexOf(entity);
     if (index === -1) return;
+
     entities.splice(index, 1);
     entity.tags.splice(entity.tags.indexOf(tag), 1);
   };
-
+  listTags = (): string[] => {
+    let tagList = [];
+    for (const tag in this.tags) {
+      tagList.push(tag);
+    }
+    return tagList;
+  };
   addComponent = (entity: Entity, component: Component) => {
     if (entity.components.includes(component)) return;
     entity[component.name] = component;
