@@ -81,6 +81,7 @@ export class EntityManager {
   removeAllComponents = (entity: Entity) =>
     entity.components.forEach(component => entity.removeComponent(component));
 
+  // tslint:disable-next-line:no-any
   removeComponent = (entity: Entity, component: any) => {
     if (!entity.hasComponent(component)) return;
     entity.components = entity.components.filter(
