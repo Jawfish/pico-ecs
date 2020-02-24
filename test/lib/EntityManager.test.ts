@@ -1,31 +1,24 @@
 import { EntityManager } from '../../src/lib/EntityManager';
-import { Entity } from '../../src/lib/Entity';
 import { Component } from '../../src/lib/Component';
 
-class TestComponentOne implements Component {
-  name: string;
-  entity: Entity | null;
+class TestComponentOne extends Component {
   x: number;
   y: number;
   constructor(x: number, y: number) {
-    this.name = this.constructor.name;
-    this.entity = null;
+    super();
     this.x = x;
     this.y = y;
   }
 }
 
-class TestComponentTwo {
-  name: string;
-  entity: Entity | null;
+class TestComponentTwo extends Component {
   options: object;
   constructor(options: object) {
-    this.name = this.constructor.name;
-    this.entity = null;
+    super();
     this.options = options;
   }
 }
-// TODO: change tests to not use/mutate the same entity
+// TODO: change tests to not use/mutate the same entities, rely on each other, or depend on execution order
 describe('EntityManager', () => {
   const testManager = new EntityManager();
   const testEntity = testManager.createEntity();
@@ -36,9 +29,13 @@ describe('EntityManager', () => {
     expect(testEntity.manager).toBe(testManager);
     expect(testEntity.tags).toEqual([]);
   });
+  it('lists entities', () => {
+    expect(testManager.listEntities()).toEqual([testEntity]);
+  });
   it('counts entities', () => {
     const testEntity2 = testManager.createEntity();
     expect(testManager.count()).toEqual(2);
+    testEntity2.remove();
   });
   it('adds components', () => {
     testEntity.addComponent(new TestComponentOne(17, 23)).addComponent(
@@ -65,11 +62,12 @@ describe('EntityManager', () => {
     expect(testEntity.TestComponentOne).toEqual(undefined);
     expect(testEntity.TestComponentTwo.entity).toBe(testEntity);
   });
-  it('removes entities', () => {
-    const count = testManager.count();
-    testEntity.remove();
-    expect(testManager.count()).toEqual(count - 1);
+  it('removes all components', () => {
+    testEntity.addComponent(new TestComponentOne(35, 35));
+    testEntity.removeAllComponents();
+    expect(testEntity.components).toEqual([]);
   });
+
   it('adds tags', () => {
     testEntity
       .addTag('testTag1')
@@ -85,5 +83,19 @@ describe('EntityManager', () => {
   it('removes tags', () => {
     testEntity.removeTag('testTag2');
     expect(testEntity.tags).toEqual(['testTag1', 'testTag3']);
+  });
+  it('queries tags', () => {
+    expect(testManager.queryTag('testTag1')).toEqual([testEntity]);
+  });
+  it('removes entities', () => {
+    testEntity.remove();
+    expect(testManager.listEntities()).toEqual([]);
+    testManager.createEntity();
+    testManager.createEntity();
+    testManager.createEntity();
+    testManager.createEntity();
+    testManager.removeAllEntities();
+    expect(testManager.listEntities()).toEqual([]);
+    expect(testManager.count()).toEqual(0);
   });
 });
