@@ -61,6 +61,7 @@ describe('Entity', () => {
       let bool = true;
       for (let i = 0; i < toCompare.length; i++) {
         const item = toCompare[i];
+        // tslint:disable-next-line:no-bitwise
         bool = bool && !!~compareAgainst.indexOf(item);
       }
       return bool;

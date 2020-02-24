@@ -10,7 +10,8 @@ export class EntityPool {
     if (this.recycled.length) {
       const obj = this.recycled.pop();
       return obj;
-    } else return this.factory();
+    }
+    return this.factory();
   };
 
   recycle = (obj: object) => this.recycled.push(obj);

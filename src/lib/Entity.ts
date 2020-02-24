@@ -33,7 +33,9 @@ export class Entity {
   };
   removeAllComponents = () => this.manager.removeAllComponents(this);
   // tslint:disable-next-line:no-any
-  hasComponent(component: any): boolean {
+  hasComponent = (component: any): boolean => {
+    // TODO: find a way to do this with forEach(), includes(), indexOf(),
+    // or something else without having to iterate over the entire array
     let exists = false;
     for (let i = 0; i < this.components.length; i++) {
       if (this.components[i].name === component.name) {
@@ -42,7 +44,7 @@ export class Entity {
       }
     }
     return exists;
-  }
+  };
   hasAllComponents = (componentsToCheck: Component[]): boolean => {
     return componentsToCheck.every(component =>
       this.components.includes(component)

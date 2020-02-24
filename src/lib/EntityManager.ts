@@ -1,6 +1,7 @@
 import { EntityPool } from './EntityPool';
 import { Entity } from './Entity';
 import { Component } from './Component';
+import { timingSafeEqual } from 'crypto';
 export class EntityManager {
   private tags: { [key: string]: Entity[] };
   private entities: Entity[];
@@ -40,10 +41,10 @@ export class EntityManager {
     this.entityPool.recycle(entity);
   };
   addTag = (entity: Entity, tag: string) => {
-    let entities = this.tags[tag];
-    if (!entities) entities = this.tags[tag] = [];
-    if (entities.includes(entity)) return;
-    entities.push(entity);
+    let entitiesWithTag = this.tags[tag];
+    if (!entitiesWithTag) entitiesWithTag = this.tags[tag] = [];
+    if (entitiesWithTag.includes(entity)) return;
+    entitiesWithTag.push(entity);
     entity.tags.push(tag);
   };
   removeTag = (entity: Entity, tag: string) => {
@@ -57,29 +58,24 @@ export class EntityManager {
   };
 
   addComponent = (entity: Entity, component: Component) => {
-    if (!entity.components.includes(component)) {
-      entity[component.name] = component;
-      entity[component.name].entity = entity;
-      entity.components.push(component);
-    }
+    if (entity.components.includes(component)) return;
+    entity[component.name] = component;
+    entity[component.name].entity = entity;
+    entity.components.push(component);
   };
-  removeAllComponents = (entity: Entity) => {
-    // tslint:disable-next-line:forin
-    for (const component in entity.components) {
-      entity.removeComponent(entity.components[component]);
-    }
-  };
+  removeAllComponents = (entity: Entity) =>
+    entity.components.forEach(component => entity.removeComponent(component));
+
   // currently doesn't work because it gets passed a new instance of a Component
   // and therefore entity.components.includes(component) always returns false
   removeComponent = (entity: Entity, component: Component) => {
-    if (entity.hasComponent(component)) {
-      entity.components = entity.components.filter(
-        item => item.name !== component.name
-      );
+    if (!entity.hasComponent(component)) return;
+    entity.components = entity.components.filter(
+      item => item.name !== component.name
+    );
 
-      delete entity.components[entity.components.indexOf(component)];
-      delete entity[component.name];
-    }
+    delete entity.components[entity.components.indexOf(component)];
+    delete entity[component.name];
   };
   queryComponents = (components: Component[]): Entity[] => {
     const entities: Entity[] = [];
@@ -101,13 +97,3 @@ export class EntityManager {
     return this.entities.length;
   };
 }
-
-// TODO: implement groups
-// class Group {
-//   components: object[];
-//   entities: Entity[];
-//   constructor(components: object[], entities: Entity[] = []) {
-//     this.components = components || [];
-//     this.entities = entities || [];
-//   }
-// }
