@@ -10,13 +10,13 @@ pico-ecs is currently not published, so you must download the source from here a
 // Import necessary modules
 import { EntityManager } from './EntityManager'
 
-// Create components
+// Create component
 class Health {
+    private max: number
     current: number
-    max: number
     constructor(max: number){
-        this.current = max
         this.max = max
+        this.current = max
     }
 }
 
@@ -28,13 +28,17 @@ const player = manager.createEntity()
                       .addComponent(new Health(100))
                       .addTag('player')
 
+// Query entities
+const units = manager.queryComponentOwners('Health')
+const monsters = manager.queryTagOwners('monster')
+
 // Interact with components
 player.Health.current -= 100
-player.removeComponent('Health')
+player.addTag('dead')
 
 // Interact with entities
 manager.listEntities().forEach(entity => {
-    if (entity.hasTag('player')) {
+    if (entity.hasTag('dead')) {
         entity.remove();
     }
 });

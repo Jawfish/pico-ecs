@@ -81,7 +81,6 @@ export class EntityManager {
             entity.removeComponent(component.constructor.name)
         );
 
-    // tslint:disable-next-line:no-any
     removeComponent = (entity: Entity, component: string) => {
         if (!entity.hasComponent(component)) return;
         entity.components = entity.components.filter(
@@ -92,7 +91,6 @@ export class EntityManager {
         delete entity[component];
     };
 
-    // tslint:disable-next-line:no-any
     queryComponentOwners = (components: string[]): Entity[] => {
         const componentOwners: Entity[] = [];
         this.entities.forEach(entity => {
