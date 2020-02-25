@@ -28,6 +28,7 @@ class Health extends Component {
 
 // Create manager
 const manager = new EntityManager()
+
 // Create entity and add components
 const player = manager.createEntity()
                       .addComponent(new Health(100))
