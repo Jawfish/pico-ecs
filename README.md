@@ -39,7 +39,7 @@ player.addTag('dead')
 // Interact with entities
 manager.listEntities().forEach(entity => {
     if (entity.hasTag('dead')) {
-        entity.remove();
+        entity.remove()
     }
 });
 ```
