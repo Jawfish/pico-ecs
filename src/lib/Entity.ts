@@ -33,7 +33,6 @@ export class Entity {
 
     // tslint:disable-next-line:no-any
     hasComponent = (component: any): boolean => {
-        // TODO: clean this up
         let exists = false;
         for (let i = 0; i < this.components.length; i++) {
             if (this.components[i].name === component.name) {
