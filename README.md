@@ -34,7 +34,6 @@ player.removeComponent('Health')
 
 // Interact with entities
 manager.listEntities().forEach(entity => {
-    entity.addTag('player');
     if (entity.hasTag('player')) {
         entity.remove();
     }
