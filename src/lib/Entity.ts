@@ -22,7 +22,6 @@ export class Entity {
         return this;
     };
 
-    // tslint:disable-next-line:no-any
     removeComponent = (component: string): Entity => {
         this.manager.removeComponent(this, component);
         return this;
@@ -30,7 +29,6 @@ export class Entity {
 
     removeAllComponents = () => this.manager.removeAllComponents(this);
 
-    // tslint:disable-next-line:no-any
     hasComponent = (component: string): boolean => {
         let exists = false;
         for (let i = 0; i < this.components.length; i++) {
@@ -42,7 +40,6 @@ export class Entity {
         return exists;
     };
 
-    // tslint:disable-next-line:no-any
     hasAllComponents = (componentsToCheck: string[]): boolean => {
         for (let i = 0; i < componentsToCheck.length; i++) {
             if (!this.hasComponent(componentsToCheck[i])) {

@@ -29,5 +29,14 @@ const player = manager.createEntity()
                       .addTag('player')
 
 // Interact with components
-player.Health.current -= 50
+player.Health.current -= 100
+player.removeComponent('Health')
+
+// Interact with entities
+
+manager.entities.forEach(entity => {
+    if (entity.hasTag('player'){
+        entity.remove
+    })
+})
 ```
