@@ -34,9 +34,9 @@ const monsters = manager.queryTagOwners('monster')
 
 // Interact with components
 player.Health.current -= 100
-player.addTag('dead')
 
 // Interact with entities
+player.addTag('dead')
 manager.listEntities().forEach(entity => {
     if (entity.hasTag('dead')) {
         entity.remove()
