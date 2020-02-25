@@ -13,14 +13,12 @@ pico-ecs is currently not published, so you must download the source from here a
 ```ts
 // Import necessary modules
 import { EntityManager } from './EntityManager'
-import { Component } from './Component'
 
 // Create components
-class Health extends Component {
+class Health {
     current: number
     max: number
     constructor(max: number){
-        super()
         this.current = max
         this.max = max
     }

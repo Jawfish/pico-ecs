@@ -1,26 +1,9 @@
 import { EntityManager } from '../../src/lib/EntityManager';
-import { Component } from '../../src/lib/Component';
 
-class TestComponentOne extends Component {
-    constructor() {
-        super();
-    }
-}
-class TestComponentTwo extends Component {
-    constructor() {
-        super();
-    }
-}
-class TestComponentThree extends Component {
-    constructor() {
-        super();
-    }
-}
-class TestComponentFour extends Component {
-    constructor() {
-        super();
-    }
-}
+class TestComponentOne {}
+class TestComponentTwo {}
+class TestComponentThree {}
+class TestComponentFour {}
 
 // TODO: change tests to not use/mutate the same entities, rely on each other, or depend on execution order
 describe('Entity', () => {
@@ -32,30 +15,33 @@ describe('Entity', () => {
         .addComponent(new TestComponentThree());
 
     it('knows if it has a component', () => {
-        expect(testEntity.hasComponent(TestComponentOne)).toEqual(true);
-        expect(testEntity.hasComponent(TestComponentTwo)).toEqual(true);
-        expect(testEntity.hasComponent(TestComponentThree)).toEqual(true);
-        expect(testEntity.hasComponent(TestComponentFour)).toEqual(false);
+        expect(testEntity.hasComponent('TestComponentOne')).toEqual(true);
+        expect(testEntity.hasComponent('TestComponentTwo')).toEqual(true);
+        expect(testEntity.hasComponent('TestComponentThree')).toEqual(true);
+        expect(testEntity.hasComponent('TestComponentFour')).toEqual(false);
     });
     it('can check if it has every component in a list of components', () => {
         expect(
-            testEntity.hasAllComponents([TestComponentOne, TestComponentThree])
+            testEntity.hasAllComponents([
+                'TestComponentOne',
+                'TestComponentThree',
+            ])
         ).toEqual(true);
         expect(
             testEntity.hasAllComponents([
-                TestComponentOne,
-                TestComponentTwo,
-                TestComponentThree,
-                TestComponentFour,
+                'TestComponentOne',
+                'TestComponentTwo',
+                'TestComponentThree',
+                'TestComponentFour',
             ])
         ).toEqual(false);
         testEntity.addComponent(new TestComponentFour());
         expect(
             testEntity.hasAllComponents([
-                TestComponentOne,
-                TestComponentTwo,
-                TestComponentThree,
-                TestComponentFour,
+                'TestComponentOne',
+                'TestComponentTwo',
+                'TestComponentThree',
+                'TestComponentFour',
             ])
         ).toEqual(true);
     });

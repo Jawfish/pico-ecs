@@ -1,5 +1,4 @@
 import { EntityManager } from './EntityManager';
-import { Component } from './Component';
 
 let nextId = 0;
 
@@ -8,7 +7,7 @@ export class Entity {
     [key: string]: any;
     id: number;
     manager: EntityManager;
-    components: Component[];
+    components: Object[];
     tags: string[];
 
     constructor(manager: EntityManager) {
@@ -18,13 +17,13 @@ export class Entity {
         this.tags = [];
     }
 
-    addComponent = (component: Component): Entity => {
+    addComponent = (component: Object): Entity => {
         this.manager.addComponent(this, component);
         return this;
     };
 
     // tslint:disable-next-line:no-any
-    removeComponent = (component: any): Entity => {
+    removeComponent = (component: string): Entity => {
         this.manager.removeComponent(this, component);
         return this;
     };
@@ -32,10 +31,10 @@ export class Entity {
     removeAllComponents = () => this.manager.removeAllComponents(this);
 
     // tslint:disable-next-line:no-any
-    hasComponent = (component: any): boolean => {
+    hasComponent = (component: string): boolean => {
         let exists = false;
         for (let i = 0; i < this.components.length; i++) {
-            if (this.components[i].name === component.name) {
+            if (this.components[i].constructor.name === component) {
                 exists = true;
                 break;
             }
@@ -44,7 +43,7 @@ export class Entity {
     };
 
     // tslint:disable-next-line:no-any
-    hasAllComponents = (componentsToCheck: any[]): boolean => {
+    hasAllComponents = (componentsToCheck: string[]): boolean => {
         for (let i = 0; i < componentsToCheck.length; i++) {
             if (!this.hasComponent(componentsToCheck[i])) {
                 return false;

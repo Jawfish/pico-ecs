@@ -1,5 +1,4 @@
 import { Entity } from './Entity';
-import { Component } from './Component';
 
 export class EntityManager {
     private tags: { [key: string]: Entity[] };
@@ -71,31 +70,30 @@ export class EntityManager {
         return tagList;
     };
 
-    addComponent = (entity: Entity, component: Component) => {
+    addComponent = (entity: Entity, component: Object) => {
         if (entity.components.includes(component)) return;
-        entity[component.name] = component;
-        entity[component.name].entity = entity;
+        entity[component.constructor.name] = component;
         entity.components.push(component);
     };
 
     removeAllComponents = (entity: Entity) =>
         entity.components.forEach(component =>
-            entity.removeComponent(component)
+            entity.removeComponent(component.constructor.name)
         );
 
     // tslint:disable-next-line:no-any
-    removeComponent = (entity: Entity, component: any) => {
+    removeComponent = (entity: Entity, component: string) => {
         if (!entity.hasComponent(component)) return;
         entity.components = entity.components.filter(
-            item => item.name !== component.name
+            item => item.constructor.name !== component
         );
 
         delete entity.components[entity.components.indexOf(component)];
-        delete entity[component.name];
+        delete entity[component];
     };
 
     // tslint:disable-next-line:no-any
-    queryComponentOwners = (components: any[]): Entity[] => {
+    queryComponentOwners = (components: string[]): Entity[] => {
         const componentOwners: Entity[] = [];
         this.entities.forEach(entity => {
             if (!entity.hasAllComponents(components)) {
