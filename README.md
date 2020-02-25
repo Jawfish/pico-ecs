@@ -16,15 +16,6 @@ import { Entity } from './Entity'
 import { Component } from './Component'
 
 // Create components
-class Position extends Component {
-    x: number
-    y: number
-    constructor(x: number, y: number){
-        super()
-        this.x = x
-        this.y =y
-    }
-}
 class Health extends Component {
     current: number
     max: number
@@ -39,12 +30,9 @@ class Health extends Component {
 const manager = new EntityManager()
 // Create entity and add components
 const player = manager.createEntity()
-                      .addComponent(Position(0, 0))
-                      .addComponent(Health(100))
+                      .addComponent(new Health(100))
                       .addTag('player')
 
 // Interact with components
-player.Position.x = 50
-player.Position.y = 50
 player.Health.current -= 50
 ```
