@@ -1,6 +1,6 @@
 # pico-ecs
 
-pico-ecs is a very small TypeScript library inspired by the Entity-Component-System architecture for prototyping and rapid design iteration of small games. Based on the libraries [nano-ecs](https://github.com/noffle/nano-ecs) and [tiny-ecs](https://github.com/bvalosek/tiny-ecs).
+pico-ecs is a very small TypeScript library for rapid design iteration of small games. Based on the libraries [nano-ecs](https://github.com/noffle/nano-ecs) and [tiny-ecs](https://github.com/bvalosek/tiny-ecs).
 
 ## Installation
 pico-ecs is currently not published, so you must download the source from here and integrate it with a project manually.
