@@ -33,10 +33,10 @@ player.Health.current -= 100
 player.removeComponent('Health')
 
 // Interact with entities
-
-manager.entities.forEach(entity => {
-    if (entity.hasTag('player'){
-        entity.remove
-    })
-})
+manager.listEntities().forEach(entity => {
+    entity.addTag('player');
+    if (entity.hasTag('player')) {
+        entity.remove();
+    }
+});
 ```
