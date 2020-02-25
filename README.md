@@ -12,7 +12,7 @@ pico-ecs is currently not published, so you must download the source from here a
 ## Usage
 ```ts
 // Import necessary modules
-import { Entity } from './Entity'
+import { EntityManager } from './EntityManager'
 import { Component } from './Component'
 
 // Create components
