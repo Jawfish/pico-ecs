@@ -1,2 +1,1 @@
-import { EntityManager } from './lib/EntityManager';
-// todo
+export { EntityManager } from './lib/EntityManager';
