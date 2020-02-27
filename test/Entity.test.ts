@@ -1,4 +1,4 @@
-import { EntityManager } from '../../src/lib/EntityManager';
+import { EntityManager } from '../src/EntityManager';
 
 class TestComponentOne {}
 class TestComponentTwo {}
