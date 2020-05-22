@@ -1,111 +1,136 @@
-import { EntityManager } from '../src/EntityManager';
+import {
+  assertEquals,
+  assertStrictEq,
+  assertNotEquals,
+} from "https://deno.land/std/testing/asserts.ts";
 
-class TestComponentOne {
-    x: number;
-    y: number;
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
-}
+import { EntityManager } from "../src/EntityManager.ts";
 
-class TestComponentTwo {
-    options: object;
-    constructor(options: object) {
-        this.options = options;
-    }
-}
-// TODO: change tests to not use/mutate the same entities, rely on each other, or depend on execution order
-describe('EntityManager', () => {
-    const testManager = new EntityManager();
-    const testEntity = testManager.createEntity();
-    it('creates an entity', () => {
-        expect(typeof testEntity).toEqual('object');
-        expect(testEntity.components).toEqual([]);
-        expect(testEntity.id).toEqual(0);
-        expect(testEntity.manager).toBe(testManager);
-        expect(testEntity.tags).toEqual([]);
-    });
-    it('lists entities', () => {
-        expect(testManager.listEntities()).toEqual([testEntity]);
-    });
-    it('counts entities', () => {
-        const testEntity2 = testManager.createEntity();
-        expect(testManager.count()).toEqual(2);
-        testEntity2.remove();
-    });
-    it('adds components', () => {
-        testEntity.addComponent(new TestComponentOne(17, 23)).addComponent(
-            new TestComponentTwo({
-                testOptionOne: 1,
-                testOptionTwo: ['a'],
-            })
-        );
-        expect(testEntity.components.length).toEqual(2);
-        expect(testEntity.components[0].constructor.name).toEqual(
-            'TestComponentOne'
-        );
-        expect(Object.getPrototypeOf(testEntity.components[1])).toEqual(
-            Object.getPrototypeOf(new TestComponentTwo({}))
-        );
-        expect(testEntity.TestComponentOne.x).toEqual(17);
-        expect(testEntity.TestComponentOne.y).toEqual(23);
-        expect(Object.getPrototypeOf(testEntity.TestComponentTwo)).toEqual(
-            Object.getPrototypeOf(new TestComponentTwo({}))
-        );
-        expect(testEntity.TestComponentTwo.options.testOptionOne).toEqual(1);
-        expect(testEntity.TestComponentTwo.options.testOptionTwo[0]).toEqual(
-            'a'
-        );
-    });
-    it('lists entities that have a set of components', () => {
-        expect(
-            testManager.queryComponentOwners([
-                'TestComponentTwo',
-                'TestComponentOne',
-            ])
-        ).toEqual([testEntity]);
-    });
-    it('removes single components', () => {
-        testEntity.removeComponent('TestComponentOne');
-        expect(testEntity.components.length).toEqual(1);
-        expect(testEntity.hasComponent('TestComponentTwo')).toEqual(true);
-        expect(testEntity.TestComponentOne).toEqual(undefined);
-    });
-    it('removes all components', () => {
-        testEntity.addComponent(new TestComponentOne(35, 35));
-        testEntity.removeAllComponents();
-        expect(testEntity.components).toEqual([]);
-    });
+const domain: string = "entity manager";
 
-    it('adds tags', () => {
-        testEntity
-            .addTag('testTag1')
-            .addTag('testTag2')
-            .addTag('testTag3');
-        expect(testEntity.tags).toEqual(['testTag1', 'testTag2', 'testTag3']);
-        expect(testManager.listTags()).toEqual([
-            'testTag1',
-            'testTag2',
-            'testTag3',
-        ]);
-    });
-    it('removes tags', () => {
-        testEntity.removeTag('testTag2');
-        expect(testEntity.tags).toEqual(['testTag1', 'testTag3']);
-    });
-    it('queries tags', () => {
-        expect(testManager.queryTagOwners('testTag1')).toEqual([testEntity]);
-    });
-    it('removes entities', () => {
-        testEntity.remove();
-        expect(testManager.listEntities()).toEqual([]);
-        testManager.createEntity();
-        testManager.createEntity();
-        testManager.createEntity();
-        testManager.createEntity();
-        testManager.removeAllEntities();
-        expect(testManager.listEntities()).toEqual([]);
-        expect(testManager.count()).toEqual(0);
-    });
+Deno.test(`${domain} creates entities`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  assertEquals(typeof testEntity, "object");
+  assertEquals(testEntity.components, []);
+  assertNotEquals(testEntity.uuid, undefined);
+  assertStrictEq(testEntity.manager, testManager);
+  assertEquals(testEntity.tags, []);
+});
+
+Deno.test(`${domain} lists entities`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  assertEquals(testManager.listEntities(), [testEntity]);
+});
+
+Deno.test(`${domain} removes entities by tag`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity().addTag("Tag");
+  const testEntity2 = testManager.createEntity();
+  testManager.removeEntitiesByTag("Tag");
+  assertEquals(testManager.listEntities(), [testEntity2]);
+});
+
+Deno.test(`${domain} removes all entities`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  const testEntity2 = testManager.createEntity();
+  testManager.removeAllEntities();
+  assertEquals(testManager.listEntities(), []);
+});
+
+Deno.test(`${domain} removes entities`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testManager.removeEntity(testEntity);
+  assertEquals(testManager.listEntities(), []);
+});
+
+Deno.test(`${domain} adds tags`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testManager.addTag(testEntity, "Tag");
+  assertEquals(testEntity.tags, ["Tag"]);
+});
+
+Deno.test(`${domain} removes tags`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testEntity.addTag("Tag");
+  testManager.removeTag(testEntity, "Tag");
+  assertEquals(testEntity.tags, []);
+});
+
+Deno.test(`${domain} lists tags`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity().addTag("Tag");
+  assertEquals(testManager.listTags(), ["Tag"]);
+});
+
+Deno.test(`${domain} adds components`, function (): void {
+  class TestComponent {}
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testManager.addComponent(testEntity, new TestComponent());
+  assertEquals(testEntity.components.length, 1);
+  assertEquals(testEntity.components[0].constructor.name, "TestComponent");
+  assertEquals(
+    Object.getPrototypeOf(testEntity.components[0]),
+    Object.getPrototypeOf(new TestComponent()),
+  );
+  assertEquals(
+    Object.getPrototypeOf(testEntity.TestComponent),
+    Object.getPrototypeOf(new TestComponent()),
+  );
+});
+
+Deno.test(`${domain} removes all components`, function (): void {
+  class TestComponent {}
+  class TestComponent2 {}
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testEntity.addComponent(new TestComponent());
+  testEntity.addComponent(new TestComponent2());
+  testManager.removeAllComponents(testEntity);
+  assertEquals(testEntity.components.length, 0);
+  assertEquals(testEntity.components, []);
+});
+
+Deno.test(`${domain} removes single components`, function (): void {
+  class TestComponent {}
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testEntity.addComponent(new TestComponent());
+  testManager.removeComponent(testEntity, "TestComponent");
+  assertEquals(testEntity.components.length, 0);
+  assertEquals(testEntity.TestComponent, undefined);
+});
+
+Deno.test(`${domain} queries component owners`, function (): void {
+  class TestComponent {}
+  class TestComponent2 {}
+  const testManager = new EntityManager();
+  const testEntity = testManager
+    .createEntity()
+    .addComponent(new TestComponent())
+    .addComponent(new TestComponent2());
+  assertEquals(
+    testManager.queryComponentOwners(["TestComponent", "TestComponent2"]),
+    [testEntity],
+  );
+});
+
+Deno.test(`${domain} queries tag owners`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  testEntity.addTag("tag");
+  assertEquals(testManager.queryTagOwners("tag"), [testEntity]);
+});
+
+Deno.test(`${domain} counts entities`, function (): void {
+  const testManager = new EntityManager();
+  const testEntity = testManager.createEntity();
+  const testEntity2 = testManager.createEntity();
+  assertEquals(testManager.count(), 2);
 });

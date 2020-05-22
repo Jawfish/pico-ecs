@@ -1,0 +1,22 @@
+implement groups
+implement collections
+implement actions
+implement entity creation factory (?)
+add more thorough cases for individual unit tests
+add assert messages
+refactor entity id to be determined by the manager; don't directly modify the id of the entity object, as this persists across managers and entities
+
+entity.ts:
+    hasCollection()
+
+changelog:
+Ported project to Deno
+Replaced incremental integer ids with RFC 4122-compliant UUIDs
+Made entity removal more thorough
+Rewrote testing to be more decoupled
+Migrated tests from Jest to Deno's native test suite
+Minor naming and docstring wording improvements
+
+implemented actions
+implemented groups
+implemented collections
