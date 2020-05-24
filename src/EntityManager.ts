@@ -1,12 +1,41 @@
 import { Entity } from "./Entity.ts";
 
 export class EntityManager {
-  private tags: { [key: string]: Entity[] };
-  private entities: Entity[];
+  private _tags: { [key: string]: Entity[] };
+  private _entities: Entity[];
   constructor() {
-    this.tags = {};
-    this.entities = [];
+    this._tags = {};
+    this._entities = [];
   }
+
+  public get entities(): Entity[] {
+    return this._entities;
+  }
+
+  public get tags(): { [key: string]: Entity[] } {
+    return this._tags;
+  }
+
+  addEntityToTag = (tag: string, entity: Entity): EntityManager => {
+    if (tag === "") return this;
+    if (this._tags[tag] && this._tags[tag].includes(entity)) return this;
+    if (tag in this.tags && !this.tags[tag].includes(entity)) {
+      this.tags[tag].push(entity);
+    } else {
+      this.tags[tag] = [entity];
+    }
+    return this;
+  };
+
+  removeEntityFromTag = (tag: string, entity: Entity): EntityManager => {
+    if (tag === "") return this;
+    if (!this._tags[tag] && this._tags[tag].includes(entity)) return this;
+    this._tags[tag].splice(this.tags[tag].indexOf(entity), 1);
+    return this;
+  };
+
+  tagContainsEntity = (tag: string, entity: Entity) =>
+    this._tags[tag].includes(entity);
 
   /**
      * Create an entity
@@ -15,7 +44,6 @@ export class EntityManager {
   createEntity = (): Entity => {
     const entity: Entity = new Entity(this);
     this.entities.push(entity);
-    entity.manager = this;
     return entity;
   };
 
@@ -53,53 +81,15 @@ export class EntityManager {
     if (!this.entities.includes(entity)) {
       throw new Error("Tried to remove nonexistent entity");
     }
-    this.removeAllComponents(entity);
-    for (var property in entity) {
-      if (entity.hasOwnProperty(property)) {
-        delete entity[property];
-      }
-    }
-    this.entities = this.entities.filter((item) => item !== entity);
-  };
-
-  /**
-     * Adds a tag to the specified entity
-     * @param {Entity} entity The entity to add the tag to
-     * @param {string} tag The tag to add to the entity
-     */
-  addTag = (entity: Entity, tag: string) => {
-    if (tag === "") {
-      throw new Error("Tried to add an empty tag");
-    }
-    let entitiesWithTag = this.tags[tag];
-    if (!entitiesWithTag) entitiesWithTag = this.tags[tag] = [];
-    if (entitiesWithTag.includes(entity)) return;
-
-    entitiesWithTag.push(entity);
-    entity.tags.push(tag);
-  };
-
-  /**
-     * Removes the specified tag from the entity
-     * @param {Entity} entity The entity to remove the tag from
-     * @param {string} tag The tag to remove from the entity
-     */
-  removeTag = (entity: Entity, tag: string) => {
-    const entities = this.tags[tag];
-    if (!entities) return;
-
-    const index = entities.indexOf(entity);
-    if (index === -1) return;
-
-    entities.splice(index, 1);
-    entity.tags.splice(entity.tags.indexOf(tag), 1);
+    entity.clearComponents();
+    this._entities = this.entities.filter((item) => item !== entity);
   };
 
   /**
      * List all existing tags on this manager
      * @returns {string[]} Array of all tags on this manager
      */
-  listTags = (): string[] => {
+  listUsedTags = (): string[] => {
     const tagList = [];
     for (const tag of Object.keys(this.tags)) {
       tagList.push(tag);
@@ -108,46 +98,12 @@ export class EntityManager {
   };
 
   /**
-     * Adds a component to the specified entity
-     * @param {Entity} entity The entity to add a component to
-     * @param {Object} component The component to add to the entity
-     */
-  addComponent = (entity: Entity, component: Object) => {
-    if (entity.components.includes(component)) return;
-    entity[component.constructor.name] = component;
-    entity.components.push(component);
-  };
-
-  /**
-     * Remove all components from the specified entity
-     * @param {Entity} entity The entity to remove all components from
-     */
-  removeAllComponents = (entity: Entity) =>
-    entity.components.forEach((component) =>
-      entity.removeComponent(component.constructor.name)
-    );
-
-  /**
-     * Remove the specified component from the specified entity
-     * @param {Entity} entity The entity from which to remove the component
-     * @param {string} component The component to remove from the entity
-     */
-  removeComponent = (entity: Entity, component: string) => {
-    if (!entity.hasComponent(component)) return;
-    entity.components = entity.components.filter(
-      (item) => item.constructor.name !== component,
-    );
-
-    delete entity.components[entity.components.indexOf(component)];
-    delete entity[component];
-  };
-
-  /**
+   * 
      * Get a list of all entities that have the specified components
-     * @param {string[]} components The components to check entities for
+     * @param {T[]} components The components to check entities for
      * @returns {Entity[]} Array of entities that contain the specified components
      */
-  queryComponentOwners = (components: string[]): Entity[] => {
+  queryComponentOwners = <T>(components: T[]): Entity[] => {
     const componentOwners: Entity[] = [];
     this.entities.forEach((entity) => {
       if (!entity.hasAllComponents(components)) {

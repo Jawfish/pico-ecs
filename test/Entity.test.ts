@@ -1,30 +1,25 @@
 import {
   assertEquals,
   assertNotEquals,
+  assertThrows,
 } from "https://deno.land/std/testing/asserts.ts";
 import { Entity } from "../src/Entity.ts";
 import { EntityManager } from "../src/EntityManager.ts";
 
 const domain: string = "entity";
 
-Deno.test(`${domain} instantiates as expected`, function (): void {
+Deno.test(`${domain} instantiates as expected`, (): void => {
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  const testEntity2 = new Entity(testManager);
-  assertEquals(
-    testEntity.components.length,
-    0,
-    `expected entity to have 0 components, received ${testEntity.components.length}`,
-  );
-  assertEquals(
-    testEntity.tags.length,
-    0,
-    "found tags on a fresh instantiation of an entity; should be empty",
+  assertNotEquals(
+    testEntity,
+    undefined,
+    "expected entity to instantiate, but it was undefined",
   );
   assertNotEquals(
     testEntity.uuid,
     undefined,
-    `expected first entity instantiated to have an ID, found ${testEntity.uuid}`,
+    "expected first entity instantiated to have an ID, but it was undefined",
   );
   assertEquals(
     testEntity.manager,
@@ -33,11 +28,24 @@ Deno.test(`${domain} instantiates as expected`, function (): void {
   );
 });
 
-Deno.test(`${domain} can add components to itself`, function (): void {
+Deno.test(`${domain} can access its components`, (): void => {
+  class TestComponent {
+    x: number = 0;
+    y: number = 0;
+  }
+  const testManager = new EntityManager();
+  const testEntity = new Entity(testManager);
+  const testComponent = new TestComponent();
+  testEntity.addComponent(testComponent);
+  assertEquals(testEntity.getComponent<TestComponent>().x, 0);
+});
+
+Deno.test(`${domain} can add components to itself`, (): void => {
   class TestComponent {}
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  testEntity.addComponent(new TestComponent());
+  const testComponent = new TestComponent();
+  testEntity.addComponent(testComponent);
   assertEquals(testEntity.components.length, 1);
   assertEquals(testEntity.components[0].constructor.name, "TestComponent");
   assertEquals(
@@ -45,82 +53,101 @@ Deno.test(`${domain} can add components to itself`, function (): void {
     Object.getPrototypeOf(new TestComponent()),
   );
   assertEquals(
-    Object.getPrototypeOf(testEntity.TestComponent),
-    Object.getPrototypeOf(new TestComponent()),
+    testEntity.components[0],
+    testComponent,
   );
+  // entity should not be able to add the same component twice
+  assertThrows(() => {
+    testEntity.addComponent(testComponent);
+  });
 });
 
-Deno.test(`${domain} can remove individual components from itself`, function (): void {
+Deno.test(`${domain} can remove individual components from itself`, (): void => {
   class TestComponent {}
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  testEntity.addComponent(new TestComponent());
-  testEntity.removeComponent("TestComponent");
-  assertEquals(testEntity.components.length, 0);
-  assertEquals(testEntity.TestComponent, undefined);
+  const testComponent = new TestComponent();
+  testEntity.addComponent(testComponent);
+  testEntity.removeComponent<TestComponent>();
+  assertEquals(
+    testEntity.components.length,
+    0,
+  );
 });
 
-Deno.test(`${domain} can remove all components from itself`, function (): void {
+Deno.test(`${domain} can remove all components from itself`, (): void => {
   class TestComponent {}
   class TestComponent2 {}
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
   testEntity.addComponent(new TestComponent());
   testEntity.addComponent(new TestComponent2());
-  testEntity.removeAllComponents();
+  testEntity.clearComponents();
   assertEquals(testEntity.components.length, 0);
   assertEquals(testEntity.components, []);
 });
 
-Deno.test(`${domain} knows if it has an individual component`, function (): void {
+Deno.test(`${domain} knows if it has an individual component`, (): void => {
   class TestComponent {}
+  const testComponent = new TestComponent();
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  testEntity.addComponent(new TestComponent());
-  assertEquals(testEntity.hasComponent("TestComponent"), true);
+  testEntity.addComponent(testComponent);
+  assertEquals(
+    testEntity.hasComponent<TestComponent>(),
+    true,
+  );
 });
 
-Deno.test(`${domain} knows if it has a collection of components`, function (): void {
+Deno.test(`${domain} knows if it has a collection of components`, (): void => {
   class TestComponent {}
   class TestComponent2 {}
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
+  const testComponent = new TestComponent();
+  const testComponent2 = new TestComponent2();
   testEntity
-    .addComponent(new TestComponent())
-    .addComponent(new TestComponent2());
+    .addComponent(testComponent)
+    .addComponent(testComponent2);
   assertEquals(
-    testEntity.hasAllComponents(["TestComponent", "TestComponent2"]),
+    testEntity.hasAllComponents([testComponent, testComponent2]),
     true,
     `entity does not contain the added components`,
   );
 });
 
-Deno.test(`${domain} knows if it has an individual tag`, function (): void {
+Deno.test(`${domain} knows if it has an individual tag`, (): void => {
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  testEntity.addTag("Tag");
+  testEntity.tag("Tag");
   assertEquals(testEntity.hasTag("Tag"), true);
 });
 
-Deno.test(`${domain} can add tags to itself`, function (): void {
+Deno.test(`${domain} knows every tag it has`, (): void => {
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  testEntity.addTag("testTag1").addTag("testTag2");
-  assertEquals(testEntity.tags, ["testTag1", "testTag2"]);
+  testManager.addEntityToTag("testTag1", testEntity);
+  assertEquals(testEntity.listTags(), ["testTag1"]);
 });
 
-Deno.test(`${domain} can remove tags from itself`, function (): void {
+Deno.test(`${domain} can add tags to itself`, (): void => {
   const testManager = new EntityManager();
   const testEntity = new Entity(testManager);
-  testEntity.addTag("testTag1").addTag("testTag2").removeTag("testTag1");
+  testEntity.tag("testTag1").tag("testTag2");
+  assertEquals(testEntity.listTags(), ["testTag1", "testTag2"]);
+});
+
+Deno.test(`${domain} can remove tags from itself`, (): void => {
+  const testManager = new EntityManager();
+  const testEntity = new Entity(testManager);
+  testEntity.tag("testTag1").tag("testTag2").untag("testTag1");
   assertEquals(testEntity.hasTag("testTag2"), true);
   assertEquals(testEntity.hasTag("testTag1"), false);
 });
 
-Deno.test(`${domain} can remove itself`, function (): void {
+Deno.test(`${domain} can remove itself`, (): void => {
   const testManager = new EntityManager();
   const testEntity = testManager.createEntity();
   testEntity.remove();
-  assertEquals(testEntity, {});
   assertEquals(testManager.listEntities(), []);
 });

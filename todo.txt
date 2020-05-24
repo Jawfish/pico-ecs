@@ -1,13 +1,24 @@
 implement groups
 implement collections
 implement actions
+    entity.addAction
+    entity.executeAction
+    entity.executeNextAction
+    entity.executePreviousAction
+    entity.unexecutePreviousAction
+    entity.executeAllActions
 implement entity creation factory (?)
 add more thorough cases for individual unit tests
 add assert messages
 refactor entity id to be determined by the manager; don't directly modify the id of the entity object, as this persists across managers and entities
-
-entity.ts:
-    hasCollection()
+refactor tests to test behavior over specific implementation
+switch fields to private and use getters/setters (?)
+fix mixing using objects and strings (hasComponent takes an object, hasAllComponents takes an array of strings)
+clean up and add docstrings
+merge groups and tags; use tags for entities and collections for components
+add:
+    entity.ts:
+        hasCollection()
 
 changelog:
 Ported project to Deno
@@ -16,7 +27,3 @@ Made entity removal more thorough
 Rewrote testing to be more decoupled
 Migrated tests from Jest to Deno's native test suite
 Minor naming and docstring wording improvements
-
-implemented actions
-implemented groups
-implemented collections
